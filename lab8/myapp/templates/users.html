@@ -1,13 +1,37 @@
 <!DOCTYPE html>
-<html>
-<head><title>Пользователи</title></head>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
 <body>
-    <h1>Пользователи</h1>
-    <ul>
-        {% for user in users %}
-        <li><a href="/user?id={{ user.id }}">{{ user.name }}</a></li>
+    <nav>
+        {% for nav in navigation %}
+        <a href="{{ nav.href }}">{{ nav.caption }}</a>
         {% endfor %}
-    </ul>
-    <a href="/">Главная</a>
+        <a href="/users">Все пользователи</a>
+    </nav>
+    
+    <main>
+        <h1>{{ user.name }}</h1>
+        <p><strong>ID:</strong> {{ user.id }}</p>
+        
+        <section>
+            <h2>Подписки на валюты</h2>
+            {% if subscriptions %}
+            <ul>
+                {% for sub in subscriptions %}
+                <li>{{ sub.currency_id }} 
+                    <small>(ID: {{ sub.currency_id }})</small>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>У пользователя нет активных подписок</p>
+            {% endif %}
+        </section>
+    </main>
 </body>
 </html>
