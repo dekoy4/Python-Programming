@@ -2,17 +2,85 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ user.name }}</title>
+    <title>{{ user.name }} - Профиль</title>
     <link rel="stylesheet" href="/static/style.css">
+    <!--Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>{{ user.name }} (ID: {{ user.id }})</h1>
-    <h2>Подписки:</h2>
-    <ul>
-        {% for sub in subscriptions %}
-        <li>{{ sub.currency_id }}</li>
+    <nav>
+        <a href="/"> Главная</a>
+        <a href="/users"> Пользователи</a>
+        <a href="/currencies"> Валюты</a>
+        <a href="/author"> Автор</a>
+    </nav>
+    
+    <main>
+        <h1>{{ user.name }}</h1>
+        <p><strong>ID:</strong> {{ user.id }}</p>
+        
+        <section>
+            <h2>Подписки на валюты</h2>
+            {% if subscriptions %}
+            <ul>
+                {% for sub in subscriptions %}
+                <li> {{ sub.currency_id }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>Нет активных подписок</p>
+            {% endif %}
+        </section>
+        
+        <!-- ГРАФИКИ ДИНАМИКИ -->
+        {% if charts_data %}
+        <section>
+            <h2> Динамика курсов (3 месяца)</h2>
+            {% for chart in charts_data %}
+            <div style="margin: 30px 0;">
+                <h3>{{ chart.currency }}</h3>
+                <canvas id="chart-{{ chart.currency }}" width="400" height="200"></canvas>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+        
+        <a href="/users">← Все пользователи</a>
+    </main>
+
+    <!-- JAVASCRIPT для графиков -->
+    <script>
+        {% for chart in charts_data %}
+        {
+            const ctx = document.getElementById('chart-{{ chart.currency }}').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [{% for point in chart.history %}'{{ point.date }}',{% endfor %}],
+                    datasets: [{
+                        label: '{{ chart.currency }} / RUB',
+                        data: [{% for point in chart.history %}{{ point.value }},{% endfor %}],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'Курс (₽)' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Дата' }
+                        }
+                    }
+                }
+            });
+        }
         {% endfor %}
-    </ul>
-    <a href="/users">← Пользователи</a>
+    </script>
 </body>
 </html>
