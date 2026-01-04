@@ -90,21 +90,30 @@ class CurrencyAppHandler(BaseHTTPRequestHandler):
         )
         self._send_html_response(html_content)
     
-    def handle_currencies(self) -> None:
-        """Обработка страницы валют."""
-        try:
-            currency_data = get_currencies(['USD', 'EUR', 'GBP'])
-            currencies = []
-            
-            for code, value in currency_data.items():
-                currency = Currency(char_code=code, value=value, nominal=1)
-                currencies.append({
-                    'char_code': currency.char_code,
-                    'value': f"{currency.value:.4f}",
-                    'nominal': currency.nominal
-                })
-        except Exception:
-            currencies = []
+def handle_currencies(self) -> None:
+    """Обработка страницы валют."""
+    try:
+        currency_data = get_currencies(['USD', 'EUR', 'GBP', 'IDR'])
+        currencies = []
+        
+        # Словарь с названиями валют для демонстрации
+        currency_names = {
+            'USD': 'Доллар США',
+            'EUR': 'Евро',
+            'GBP': 'Фунт стерлингов',
+            'IDR': 'Индонезийская рупия'
+        }
+        
+        for code, value in currency_data.items():
+            currency = Currency(char_code=code, value=value, nominal=1)
+            currencies.append({
+                'char_code': currency.char_code,
+                'name': currency_names.get(code, 'Неизвестная валюта'),
+                'value': currency.value,
+                'nominal': currency.nominal
+            })
+    except Exception:
+        currencies = []
         
         html_content = self.templates['currencies'].render(
             currencies=currencies,
