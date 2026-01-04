@@ -6,7 +6,7 @@ import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import Dict, Any, List
 from jinja2 import Environment, PackageLoader, select_autoescape
-
+from utils.currencies_api import get_currencies, get_currency_history
 # Импорт моделей
 from models import Author, App, User, Currency, UserCurrency
 from utils.currencies_api import get_currencies
