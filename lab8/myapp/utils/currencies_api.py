@@ -40,3 +40,31 @@ def get_currencies(currency_codes: Optional[list] = None) -> Dict[str, float]:
         print(f"Ошибка API: {e}")
         # Fallback на тестовые данные
         return {'USD': 91.25, 'EUR': 99.80, 'GBP': 115.00}
+        
+def get_currency_history(currency_code: str, months: int = 3) -> List[Dict]:
+    """Получить историю курсов за N месяцев.
+    
+    Returns:
+        [{'date': '2025-12-01', 'value': 91.25}, ...]
+    """
+    from datetime import datetime, timedelta
+    import random
+    
+    history = []
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=90)  # 3 месяца
+    
+    current_date = start_date
+    while current_date <= end_date:
+        # Симуляция реальных курсов (в продакшене - API ЦБ)
+        base_rate = 90.0 if currency_code == 'USD' else 98.0
+        noise = random.uniform(-2, 2)  # Колебания ±2%
+        rate = base_rate + noise
+        
+        history.append({
+            'date': current_date.strftime('%Y-%m-%d'),
+            'value': round(rate, 4)
+        })
+        current_date += timedelta(days=7)  # Недельные данные
+    
+    return history
