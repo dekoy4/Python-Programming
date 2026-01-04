@@ -7,14 +7,12 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <nav>
-        {% for nav in navigation %}
-        <a href="{{ nav.href }}">{{ nav.caption }}</a>
-        {% endfor %}
-        <a href="/currencies">Валюты</a>
-        <a href="/users">Пользователи</a>
-        <a href="/author">Автор</a>
-    </nav>
+<nav>
+    <a href="/">Главная</a>
+    <a href="/users">Пользователи</a>
+    <a href="/currencies">Валюты</a>
+    <a href="/author">Автор</a>
+</nav>
     
     <main>
         <h1>{{ myapp }} v{{ version }}</h1>
