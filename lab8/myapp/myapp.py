@@ -198,4 +198,4 @@ def run_server(host: str = 'localhost', port: int = 8000) -> None:
 
 
 if __name__ == '__main__':
-    run_server(
+    run_server()
