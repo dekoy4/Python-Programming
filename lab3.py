@@ -225,4 +225,4 @@ class TestBinaryTree(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(argv=[''], verbosity=2, exit=False) # вместо unittest.main()
+    unittest.main(argv=[''], verbosity=2, exit=False)
