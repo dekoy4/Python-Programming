@@ -26,8 +26,8 @@ class CurrencyAppHandler(BaseHTTPRequestHandler):
     def initialize_data(cls):
         """Инициализация данных один раз."""
         if cls.main_author is None:
-            cls.main_author = Author("Иван Иванов", "ИТ-21")
-            cls.myapp = App("CurrenciesListApp", "1.0.0", cls.main_author)
+            cls.main_author = Author("Юльякшин Анатолий", "P4150")
+            cls.myapp = App("Валютный лист", "1.0.1", cls.main_author)
             
             cls.users = [
                 User("user1", "Алексей Петров"),
