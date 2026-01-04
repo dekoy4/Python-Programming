@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.name }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>{{ user.name }} (ID: {{ user.id }})</h1>
+    <h2>Подписки:</h2>
+    <ul>
+        {% for sub in subscriptions %}
+        <li>{{ sub.currency_id }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/users">← Пользователи</a>
+</body>
+</html>
