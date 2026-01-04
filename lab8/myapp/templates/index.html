@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ myapp }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav>
+        {% for nav in navigation %}
+        <a href="{{ nav.href }}">{{ nav.caption }}</a>
+        {% endfor %}
+        <a href="/currencies">Валюты</a>
+        <a href="/users">Пользователи</a>
+        <a href="/author">Автор</a>
+    </nav>
+    
+    <main>
+        <h1>{{ myapp }} v{{ version }}</h1>
+        <p>Простое веб-приложение для отслеживания курсов валют.</p>
+        
+        <section>
+            <h2>Автор</h2>
+            <p><strong>{{ author_name }}</strong></p>
+            <p>Группа: {{ group }}</p>
+        </section>
+    </main>
+</body>
+</html>
