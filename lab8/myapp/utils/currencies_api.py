@@ -1,7 +1,7 @@
 """API для получения курсов валют с ЦБ РФ."""
 
 import requests
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from xml.etree import ElementTree as ET
 
 def get_currencies(currency_codes: Optional[list] = None) -> Dict[str, float]:
