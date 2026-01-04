@@ -126,23 +126,34 @@ class CurrencyAppHandler(BaseHTTPRequestHandler):
         self._send_html_response(html_content)
     
     def handle_user(self) -> None:
-        """Страница пользователя."""
-        import urllib.parse
-        query_params = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-        user_id = query_params.get('id', [''])[0]
-        
-        user = next((u for u in CurrencyAppHandler.users if u.id == user_id), None)
-        if not user:
-            self.handle_404()
-            return
-        
-        subscriptions = [{'currency_id': sub.currency_id} for sub in user.subscriptions]
-        html_content = CurrencyAppHandler.templates['user'].render(
-            user=user, subscriptions=subscriptions,
-            navigation=[{'caption': 'Главная', 'href': '/'}, {'caption': 'Пользователи', 'href': '/users'}]
-        )
-        self._send_html_response(html_content)
+    """Страница пользователя с графиками."""
+    import urllib.parse
+    query_params = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+    user_id = query_params.get('id', [''])[0]
     
+    user = next((u for u in CurrencyAppHandler.users if u.id == user_id), None)
+    if not user:
+        self.handle_404()
+        return
+    
+    subscriptions = [{'currency_id': sub.currency_id} for sub in user.subscriptions]
+    
+    # История курсов для подписок пользователя
+    charts_data = []
+    for sub in subscriptions:
+        history = get_currency_history(sub['currency_id'])
+        charts_data.append({
+            'currency': sub['currency_id'],
+            'history': history
+        })
+    
+    html_content = CurrencyAppHandler.templates['user'].render(
+        user=user, 
+        subscriptions=subscriptions,
+        charts_data=charts_data,  # Данные для графиков!
+        navigation=[{'caption': 'Главная', 'href': '/'}, {'caption': 'Пользователи', 'href': '/users'}]
+    )
+    self._send_html_response(html_content)
     def handle_author(self) -> None:
         """Страница автора."""
         html_content = f"""
