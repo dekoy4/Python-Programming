@@ -1,3 +1,4 @@
+# Группа P4150 Юльякшин Анатолий Сергеевич
 from typing import List, Tuple, Callable
 import random
 import unittest
