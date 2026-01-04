@@ -5,12 +5,12 @@ import os
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import Dict, Any, List
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from utils.currencies_api import get_currencies, get_currency_history
-# Импорт моделей
-from models import Author, App, User, Currency, UserCurrency
-from utils.currencies_api import get_currencies
-
+from models.author import Author
+from models.app import App
+from models.user import User
+from models.user_currency import UserCurrency
 
 class CurrencyAppHandler(BaseHTTPRequestHandler):
     """Обработчик HTTP-запросов для приложения."""
@@ -38,7 +38,7 @@ class CurrencyAppHandler(BaseHTTPRequestHandler):
             cls.users[0].add_subscription(uc1)
             
             cls.env = Environment(
-                loader=PackageLoader("myapp"),
+                loader=FileSystemLoader("templates"),
                 autoescape=select_autoescape()
             )
             cls.templates = {
@@ -99,7 +99,6 @@ class CurrencyAppHandler(BaseHTTPRequestHandler):
     def handle_currencies(self) -> None:
         """Страница валют."""
         try:
-            from utils.currencies_api import get_currencies
             currency_data = get_currencies(['USD', 'EUR', 'GBP'])
             currencies = []
             currency_names = {
@@ -126,44 +125,53 @@ class CurrencyAppHandler(BaseHTTPRequestHandler):
         self._send_html_response(html_content)
     
     def handle_user(self) -> None:
-    """Страница пользователя с графиками."""
-    import urllib.parse
-    query_params = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-    user_id = query_params.get('id', [''])[0]
+        """Страница пользователя с графиками."""
+        import urllib.parse
+        query_params = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        user_id = query_params.get('id', [''])[0]
+        
+        user = next((u for u in CurrencyAppHandler.users if u.id == user_id), None)
+        if not user:
+            self.handle_404()
+            return
+        
+        subscriptions = [{'currency_id': sub.currency_id} for sub in user.subscriptions]
+        
+        # ГРАФИКИ: История курсов для подписок пользователя
+        charts_data = []
+        for sub in subscriptions:
+            history = get_currency_history(sub['currency_id'])
+            charts_data.append({
+                'currency': sub['currency_id'],
+                'history': history
+            })
+        
+        html_content = CurrencyAppHandler.templates['user'].render(
+            user=user, 
+            subscriptions=subscriptions,
+            charts_data=charts_data,
+            navigation=[
+                {'caption': 'Главная', 'href': '/'},
+                {'caption': 'Пользователи', 'href': '/users'}
+            ]
+        )
+        self._send_html_response(html_content)
     
-    user = next((u for u in CurrencyAppHandler.users if u.id == user_id), None)
-    if not user:
-        self.handle_404()
-        return
-    
-    subscriptions = [{'currency_id': sub.currency_id} for sub in user.subscriptions]
-    
-    # История курсов для подписок пользователя
-    charts_data = []
-    for sub in subscriptions:
-        history = get_currency_history(sub['currency_id'])
-        charts_data.append({
-            'currency': sub['currency_id'],
-            'history': history
-        })
-    
-    html_content = CurrencyAppHandler.templates['user'].render(
-        user=user, 
-        subscriptions=subscriptions,
-        charts_data=charts_data,  # Данные для графиков!
-        navigation=[{'caption': 'Главная', 'href': '/'}, {'caption': 'Пользователи', 'href': '/users'}]
-    )
-    self._send_html_response(html_content)
     def handle_author(self) -> None:
         """Страница автора."""
         html_content = f"""
         <!DOCTYPE html>
         <html><head><title>Автор</title><link rel="stylesheet" href="/static/style.css"></head>
         <body>
+            <nav>
+                <a href="/">Главная</a>
+                <a href="/users">Пользователи</a>
+                <a href="/currencies">Валюты</a>
+            </nav>
             <h1>Автор приложения</h1>
             <p>Имя: {CurrencyAppHandler.main_author.name}</p>
             <p>Группа: {CurrencyAppHandler.main_author.group}</p>
-            <a href="/">На главную</a>
+            <a href="/">← На главную</a>
         </body></html>
         """
         self._send_html_response(html_content)
@@ -195,6 +203,7 @@ class CurrencyAppHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html; charset=utf-8')
         self.end_headers()
         self.wfile.write(bytes(html_content, 'utf-8'))
+
 def run_server(host: str = 'localhost', port: int = 8000) -> None:
     """Запуск HTTP-сервера."""
     server_address = (host, port)
@@ -206,7 +215,6 @@ def run_server(host: str = 'localhost', port: int = 8000) -> None:
     except KeyboardInterrupt:
         print("\nСервер остановлен")
         httpd.server_close()
-
 
 if __name__ == '__main__':
     run_server()
