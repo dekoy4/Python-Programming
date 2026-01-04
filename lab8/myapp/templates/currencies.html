@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курсы валют</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav>
+        {% for nav in navigation %}
+        <a href="{{ nav.href }}">{{ nav.caption }}</a>
+        {% endfor %}
+        <a href="/">Главная</a>
+    </nav>
+    
+    <main>
+        <h1>Курсы валют</h1>
+        
+        <section>
+            <h2>Текущие курсы</h2>
+            {% if currencies %}
+            <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Код</th>
+                        <th>Название</th>
+                        <th>Номинал</th>
+                        <th>Курс (RUB)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for currency in currencies %}
+                    <tr>
+                        <td><strong>{{ currency.char_code }}</strong></td>
+                        <td>{{ currency.name|default('—') }}</td>
+                        <td>{{ currency.nominal }}</td>
+                        <td style="text-align: right;">{{ "%.4f"|format(currency.value) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Данные о курсах валют недоступны</p>
+            {% endif %}
+        </section>
+        
+        <section style="margin-top: 20px;">
+            <button onclick="location.reload()">Обновить курсы</button>
+        </section>
+    </main>
+</body>
+</html>
