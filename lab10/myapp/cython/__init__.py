@@ -1,25 +1,8 @@
 """
-Cython оптимизированные модули интегрирования.
-Импорт доступен только после компиляции: python setup.py build_ext --inplace
+Cython модули через pyximport (работает без setup.py)
 """
+import pyximport
+pyximport.install()
 
-try:
-    from .integrate_cython import (
-        integrate_cython_py,
-        integrate_cos_cython, 
-        integrate_sin_cython,
-        integrate_nogil_py
-    )
-    
-    # Публичный API Cython модуля
-    __all__ = [
-        'integrate_cython_py',
-        'integrate_cos_cython',
-        'integrate_sin_cython',
-        'integrate_nogil_py'
-    ]
-    
-except ImportError:
-    print("Cython модули не скомпилированы.")
-    print("Выполните: python setup.py build_ext --inplace")
-    __all__ = []
+from .integrate_cython import integrate_cos_cython, integrate_python
+__all__ = ['integrate_cos_cython', 'integrate_python']
