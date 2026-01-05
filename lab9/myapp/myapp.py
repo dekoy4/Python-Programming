@@ -23,31 +23,31 @@ class RouterHandler(BaseHTTPRequestHandler):
         super().__init__(*args, **kwargs)
 
     def do_GET(self) -> None:
-        """Обработка GET-запросов с маршрутизацией."""
-        parsed_url = urlparse(self.path)
-        query_params = parse_qs(parsed_url.query)
-        
-        try:
-            if parsed_url.path == '/':
-                self.handle_index(query_params)
-            elif parsed_url.path == '/author':
-                self.handle_author()
-            elif parsed_url.path == '/users':
-                self.handle_users()
-            elif parsed_url.path == '/user' and 'id' in query_params:
-                self.handle_user(query_params['id'][0])
-            elif parsed_url.path == '/currencies':
-                self.handle_currencies()
-            elif parsed_url.path == '/currency/delete' and 'id' in query_params:
-                self.handle_delete_currency(query_params['id'][0])
-            elif parsed_url.path == '/currency/update':
-                self.handle_update_currency(query_params)
-            elif parsed_url.path == '/currency/show':
-                self.handle_show_currencies()
-            else:
-                self.send_error(404, "Страница не найдена")
-        except Exception as e:
-            self.send_error(500, f"Ошибка сервера: {str(e)}")
+    """Обработка GET-запросов с маршрутизацией."""
+    parsed_url = urlparse(self.path)
+    query_params = parse_qs(parsed_url.query)
+    
+    try:
+        if parsed_url.path == '/':
+            self.handle_index(query_params)
+        elif parsed_url.path == '/author':
+            self.handle_author()
+        elif parsed_url.path == '/users':
+            self.handle_users()
+        elif parsed_url.path == '/user' and 'id' in query_params:
+            self.handle_user(query_params['id'][0])
+        elif parsed_url.path == '/currencies':
+            self.handle_currencies()
+        elif parsed_url.path == '/currency/delete' and 'id' in query_params:
+            self.handle_delete_currency(query_params['id'][0])
+        elif parsed_url.path == '/currency/update':
+            self.handle_update_currency(query_params)
+        elif parsed_url.path == '/currency/show':
+            self.handle_show_currencies()
+        else:
+            self.send_error(404, "Страница не найдена")
+    except Exception as e:
+        self.send_error(500, f"Server error: {str(e)}".encode('latin-1', errors='ignore').decode('latin-1'))
 
     def handle_index(self, query_params: dict) -> None:
         """Обработчик главной страницы."""
