@@ -5,7 +5,6 @@
 
 import sqlite3
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
 from jinja2 import Environment, FileSystemLoader
 import os
 
@@ -15,6 +14,15 @@ from controllers.usercontroller import UserController
 from controllers.pages import PagesController
 
 
+🔧 Исправление NameError: name 'self' is not defined
+Проблема: В коде есть статический код (не внутри метода класса), где используется self.path, но self доступен только внутри методов класса.
+
+Ошибка на строке 27 указывает, что parsed_url = urlparse(self.path) находится вне метода.
+
+Правильная структура класса RouterHandler
+Замените ВЕСЬ класс RouterHandler (строки 18-120) на этот исправленный код:
+
+python
 class RouterHandler(BaseHTTPRequestHandler):
     """Обработчик HTTP-запросов с маршрутизацией."""
     
@@ -23,31 +31,33 @@ class RouterHandler(BaseHTTPRequestHandler):
         super().__init__(*args, **kwargs)
 
     def do_GET(self) -> None:
-    """Обработка GET-запросов с маршрутизацией."""
-    parsed_url = urlparse(self.path)
-    query_params = parse_qs(parsed_url.query)
-    
-    try:
-        if parsed_url.path == '/':
-            self.handle_index(query_params)
-        elif parsed_url.path == '/author':
-            self.handle_author()
-        elif parsed_url.path == '/users':
-            self.handle_users()
-        elif parsed_url.path == '/user' and 'id' in query_params:
-            self.handle_user(query_params['id'][0])
-        elif parsed_url.path == '/currencies':
-            self.handle_currencies()
-        elif parsed_url.path == '/currency/delete' and 'id' in query_params:
-            self.handle_delete_currency(query_params['id'][0])
-        elif parsed_url.path == '/currency/update':
-            self.handle_update_currency(query_params)
-        elif parsed_url.path == '/currency/show':
-            self.handle_show_currencies()
-        else:
-            self.send_error(404, "Страница не найдена")
-    except Exception as e:
-        self.send_error(500, f"Server error: {str(e)}".encode('latin-1', errors='ignore').decode('latin-1'))
+        """Обработка GET-запросов с маршрутизацией."""
+        from urllib.parse import urlparse, parse_qs  # Импорт внутри метода
+        
+        parsed_url = urlparse(self.path)
+        query_params = parse_qs(parsed_url.query)
+        
+        try:
+            if parsed_url.path == '/':
+                self.handle_index(query_params)
+            elif parsed_url.path == '/author':
+                self.handle_author()
+            elif parsed_url.path == '/users':
+                self.handle_users()
+            elif parsed_url.path == '/user' and 'id' in query_params:
+                self.handle_user(query_params['id'][0])
+            elif parsed_url.path == '/currencies':
+                self.handle_currencies()
+            elif parsed_url.path == '/currency/delete' and 'id' in query_params:
+                self.handle_delete_currency(query_params['id'][0])
+            elif parsed_url.path == '/currency/update':
+                self.handle_update_currency(query_params)
+            elif parsed_url.path == '/currency/show':
+                self.handle_show_currencies()
+            else:
+                self.send_error(404, "Page not found")
+        except Exception as e:
+            self.send_error(500, f"Server error: {str(e)}")
 
     def handle_index(self, query_params: dict) -> None:
         """Обработчик главной страницы."""
@@ -99,11 +109,9 @@ class RouterHandler(BaseHTTPRequestHandler):
         print("=== Все валюты ===")
         for currency in currencies:
             print(currency)
-    
         self.send_response(200)
         self.send_header('Content-type', 'text/plain; charset=utf-8')
         self.end_headers()
-    
         message = "Валюты выведены в консоль. Проверьте терминал."
         self.wfile.write(message.encode('utf-8'))
 
