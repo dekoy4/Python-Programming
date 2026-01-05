@@ -99,10 +99,13 @@ class RouterHandler(BaseHTTPRequestHandler):
         print("=== Все валюты ===")
         for currency in currencies:
             print(currency)
+    
         self.send_response(200)
         self.send_header('Content-type', 'text/plain; charset=utf-8')
         self.end_headers()
-        self.wfile.write(b"Валюты выведены в консоль. Проверьте терминал.")
+    
+        message = "Валюты выведены в консоль. Проверьте терминал."
+        self.wfile.write(message.encode('utf-8'))
 
     def render_template(self, template_name: str, context: dict = None) -> None:
         """Рендеринг HTML-шаблона."""
