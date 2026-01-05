@@ -13,16 +13,6 @@ from controllers.currencycontroller import CurrencyController
 from controllers.usercontroller import UserController
 from controllers.pages import PagesController
 
-
-🔧 Исправление NameError: name 'self' is not defined
-Проблема: В коде есть статический код (не внутри метода класса), где используется self.path, но self доступен только внутри методов класса.
-
-Ошибка на строке 27 указывает, что parsed_url = urlparse(self.path) находится вне метода.
-
-Правильная структура класса RouterHandler
-Замените ВЕСЬ класс RouterHandler (строки 18-120) на этот исправленный код:
-
-python
 class RouterHandler(BaseHTTPRequestHandler):
     """Обработчик HTTP-запросов с маршрутизацией."""
     
