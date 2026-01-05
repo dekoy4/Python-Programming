@@ -60,8 +60,12 @@ class TestIntegrate(unittest.TestCase):
         self.assertAlmostEqual(result, 5.0, places=3)
 
 def test_doctests():
-    """Запуск doctest из docstring функции integrate"""
-    return doctest.testmod(integrate)
+    """Запуск doctest из модуля integrate."""
+    import sys
+    import doctest
+    sys.path.insert(0, '..')
+    import src.integrate
+    return doctest.testmod(src.integrate)
 
 if __name__ == "__main__":
     # Запуск unittest
